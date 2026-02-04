@@ -126,6 +126,23 @@ npm run dev
 ```
 L'application sera accessible sur : **http://localhost:5173**
 
+#### 5. Générer des données de test (optionnel)
+
+Pour générer 20 campagnes de test avec des données variées (statuts, budgets, impressions, clics) :
+
+**Terminal 3 - Génération de données** :
+```bash
+cd backend
+npm run seed
+```
+
+Cette commande va créer :
+- 20 campagnes avec des noms, annonceurs, budgets et dates variés
+- 8 campagnes actives avec des impressions et clics pour visualiser les statistiques (CTR, CPC)
+- Des campagnes avec différents statuts (active, paused, finished)
+
+**Note** : Le backend doit être démarré pour que cette commande fonctionne.
+
 ---
 
 ## 📚 Documentation

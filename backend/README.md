@@ -47,6 +47,21 @@ npm start
 ```
 Le serveur sera accessible sur : http://localhost:3000
 
+## Générer des données de test
+
+Pour générer 20 campagnes de test avec des données variées :
+
+```bash
+npm run seed
+```
+
+Cette commande va créer :
+- 20 campagnes avec des noms, annonceurs, budgets et dates variés
+- 8 campagnes actives avec des impressions et clics pour visualiser les statistiques (CTR, CPC)
+- Des campagnes avec différents statuts (active, paused, finished)
+
+**Note** : Le backend doit être démarré (`npm start`) pour que cette commande fonctionne.
+
 ## Documentation API (Swagger)
 
 L'API est documentée avec Swagger. Une fois le serveur démarré, accédez à la documentation interactive :
