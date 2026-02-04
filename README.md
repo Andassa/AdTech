@@ -253,13 +253,6 @@ Pour contribuer :
 2. Respectez les conventions de code existantes
 3. Ajoutez des tests pour les nouvelles fonctionnalités
 
----
-
-## 📝 Licence
-
-Ce projet est sous licence MIT.
-
----
 
 ## 🔗 Liens utiles
 
