@@ -25,9 +25,9 @@ Interface React moderne permettant de gérer des campagnes publicitaires digital
 
 **React a été choisi pour ce projet pour plusieurs raisons :**
 
-### 1. **Alignement avec l'exercice**
-- Explicitement proposé dans les consignes (React ou Next.js)
-- Standard de l'industrie AdTech (Google Ads, Meta Ads Manager, TikTok Ads)
+### 1. **Standard de l'industrie**
+- Framework largement utilisé dans l'industrie AdTech (Google Ads, Meta Ads Manager, TikTok Ads)
+- Alternative moderne à Next.js pour les applications SPA
 
 ### 2. **Adapté aux besoins du projet**
 - **Gestion d'état** : Context API simple et suffisante pour 3 pages
@@ -56,7 +56,8 @@ Interface React moderne permettant de gérer des campagnes publicitaires digital
 ## Installation
 
 ```bash
-cd ad-platform-frontend
+git clone git@github.com:Andassa/AdTech.git
+cd AdTech/ad-platform-frontend
 npm install
 ```
 
@@ -155,7 +156,7 @@ ad-platform-frontend/
 
 **Context API vs Redux**
 
-J'ai choisi Context API plutôt que Redux pour plusieurs raisons :
+Context API a été choisi plutôt que Redux pour plusieurs raisons :
 - ✅ **Simplicité** : Pas de boilerplate (actions, reducers, store)
 - ✅ **Scope adapté** : État global simple (liste campagnes + loading/error)
 - ✅ **Performance suffisante** : Pas de problème de re-render sur cette échelle
@@ -229,13 +230,8 @@ Architecture à 3 niveaux :
 ### Logique Métier AdTech
 
 **Calculs de performances**
-```javascript
-// CTR (Click Through Rate) - Mesure l'attractivité
-CTR = (clicks / impressions) × 100
 
-// CPC (Cost Per Click) - Mesure le coût d'acquisition
-CPC = budget / clicks
-```
+Le frontend calcule les métriques AdTech (CTR, CPC) en temps réel. Pour plus de détails sur les formules, consultez le [README principal](../README.md#-métriques-adtech).
 
 **Gestion des cas limites**
 - Division par zéro : Retourne 0 si `impressions = 0` ou `clicks = 0`
@@ -256,30 +252,6 @@ paused ──────→ active
 
 Frontend : affiche/cache les boutons selon le statut actuel
 
-### Architecture
-- **Context API** pour la gestion d'état globale (évite le prop drilling)
-- **Hooks personnalisés** pour encapsuler la logique métier (`useCampaigns`, `useStats`)
-- **Services centralisés** (`api.js`) pour isoler les appels HTTP
-- **Composants réutilisables** pour maintenir la cohérence UI
-
-### UI/UX
-- **Tailwind CSS** pour un développement rapide et un design cohérent
-- **Design responsive** : adaptation automatique mobile/tablette/desktop
-- **États de chargement** : spinners et messages informatifs
-- **Gestion d'erreurs** : affichage clair des erreurs avec possibilité de réessayer
-- **Feedback visuel** : transitions, hover states, animations subtiles
-
-### Performance
-- **Vite** pour un HMR ultra-rapide en développement
-- **Calculs optimisés** : `useMemo` pour les statistiques (CTR/CPC)
-- **Lazy loading** : possibilité d'ajouter le code splitting facilement
-- **Pagination** : chargement par pages pour limiter les données
-
-### Robustesse
-- **Intercepteurs Axios** : gestion centralisée des erreurs API
-- **Validation côté client** : feedback immédiat avant envoi
-- **Fallback de calcul** : calcul local des stats si l'API échoue
-- **Gestion des états** : loading, error, empty states bien gérés
 
 ---
 
