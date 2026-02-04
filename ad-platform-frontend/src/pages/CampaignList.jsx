@@ -15,12 +15,25 @@ const CampaignList = () => {
   const { campaigns, loading, error, pagination, fetchCampaigns } = useCampaigns();
   const [searchTerm, setSearchTerm] = useState('');
   const debounceTimerRef = useRef(null);
+  const fetchCampaignsRef = useRef(fetchCampaigns);
+  const isInitialMount = useRef(true);
+
+  // Mettre à jour la ref quand fetchCampaigns change
+  useEffect(() => {
+    fetchCampaignsRef.current = fetchCampaigns;
+  }, [fetchCampaigns]);
 
   const handleRowClick = (id) => navigate(`/campaigns/${id}`);
   const handlePageChange = async (params) => await fetchCampaigns(params);
 
-  // Debounce pour la recherche
+  // Debounce pour la recherche - ne se déclenche pas au montage initial
   useEffect(() => {
+    // Ignorer le premier rendu (montage initial)
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
     // Nettoyer le timer précédent
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
@@ -31,11 +44,9 @@ const CampaignList = () => {
       const filters = {};
       if (searchTerm && searchTerm.trim() !== '') {
         filters.keywoard = searchTerm.trim();
-        console.log('🔍 Recherche avec terme:', searchTerm.trim());
-      } else {
-        console.log('🔍 Recherche sans filtre (affichage de toutes les campagnes)');
       }
-      fetchCampaigns(filters);
+      // Utiliser la ref pour éviter les dépendances et les re-renders
+      fetchCampaignsRef.current(filters);
     }, 300);
 
     // Cleanup function
@@ -44,7 +55,7 @@ const CampaignList = () => {
         clearTimeout(debounceTimerRef.current);
       }
     };
-  }, [searchTerm, fetchCampaigns]);
+  }, [searchTerm]); // Retirer fetchCampaigns des dépendances
 
   const handleSearch = useCallback((value) => {
     setSearchTerm(value);
