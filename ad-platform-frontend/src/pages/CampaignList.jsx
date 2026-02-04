@@ -47,7 +47,7 @@ const CampaignList = () => {
       }
       // Utiliser la ref pour éviter les dépendances et les re-renders
       fetchCampaignsRef.current(filters);
-    }, 300);
+    }, 4000); // Debounce de 4 secondes
 
     // Cleanup function
     return () => {

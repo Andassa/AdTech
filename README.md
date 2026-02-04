@@ -7,6 +7,7 @@ Plateforme complète de gestion de campagnes publicitaires digitales permettant 
 ### Fonctionnalités principales
 
 - ✅ **Gestion de campagnes** : Création, consultation et modification de campagnes publicitaires
+- ✅ **Recherche en temps réel** : Recherche automatique par nom, annonceur ou statut (déclenchée après la saisie)
 - ✅ **Suivi des performances** : Calcul et affichage des métriques clés (CTR, CPC)
 - ✅ **Gestion des statuts** : Activation, pause et finalisation des campagnes
 - ✅ **Interface moderne** : Design responsive avec expérience utilisateur optimale
@@ -236,6 +237,23 @@ Cette roadmap combine et enrichit les améliorations prévues pour le backend et
 - **Axios** - Client HTTP
 - **Context API** - Gestion d'état
 - **Lucide React** - Bibliothèque d'icônes
+
+---
+
+## 🔍 Recherche de campagnes
+
+La plateforme dispose d'une fonctionnalité de recherche en temps réel :
+
+- **Barre de recherche** : Centrée au-dessus du tableau des campagnes
+- **Recherche automatique** : Se déclenche automatiquement après **4 secondes** de pause dans la saisie
+- **Critères de recherche** : Nom, annonceur ou statut de la campagne
+- **Important** : Il faut **taper dans le champ de recherche et attendre 4 secondes** pour déclencher la recherche automatique
+
+**Comment utiliser** :
+1. Accéder à la liste des campagnes
+2. Taper dans le champ de recherche centré au-dessus du tableau
+3. Attendre **4 secondes** (la recherche se fait automatiquement)
+4. Les résultats filtrés s'affichent instantanément
 
 ---
 

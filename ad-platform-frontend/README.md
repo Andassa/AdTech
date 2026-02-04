@@ -129,6 +129,11 @@ ad-platform-frontend/
 ### 📋 Liste des campagnes (`/`)
 - Affichage en tableau (desktop) et cartes (mobile/tablette)
 - Colonnes : Nom, Annonceur, Statut, Budget, CTR
+- **Recherche en temps réel** : Barre de recherche centrée au-dessus du tableau
+  - Recherche automatique après saisie (debounce de 4 secondes)
+  - Filtre par nom, annonceur ou statut
+  - **Important** : Il faut taper dans le champ de recherche et attendre 4 secondes pour déclencher la recherche automatique
+  - Bouton pour effacer rapidement la recherche
 - Pagination avec navigation `next` / `previous`
 - Calcul du CTR en temps réel : `(clicks / impressions) * 100`
 - État de chargement et gestion d'erreurs
@@ -257,6 +262,18 @@ Frontend : affiche/cache les boutons selon le statut actuel
 
 ## Exemple d'utilisation
 
+### Rechercher une campagne
+1. Sur la page de liste des campagnes, localiser la barre de recherche centrée au-dessus du tableau
+2. **Taper dans le champ de recherche** : La recherche se déclenche automatiquement après **4 secondes** de pause dans la saisie
+3. La recherche filtre les campagnes par :
+   - **Nom** : Recherche dans le nom de la campagne
+   - **Annonceur** : Recherche dans le nom de l'annonceur
+   - **Statut** : Recherche par statut (active, paused, finished)
+4. Les résultats se mettent à jour automatiquement sans rechargement de page
+5. Utiliser le bouton ✕ pour effacer rapidement la recherche
+
+**Note importante** : Il faut **taper dans le champ et attendre 4 secondes** pour que la recherche se déclenche automatiquement. La recherche ne se fait pas au chargement de la page.
+
 ### Créer une campagne
 1. Cliquer sur "Créer une campagne"
 2. Remplir le formulaire :
@@ -299,7 +316,6 @@ Frontend : affiche/cache les boutons selon le statut actuel
 ### Performance
 - **Code splitting** : lazy loading des routes
 - **Virtualisation** : pour les grandes listes (react-window)
-- **Debounce** : sur les recherches et filtres
 - **Service Worker** : pour le mode offline
 
 ### Sécurité
