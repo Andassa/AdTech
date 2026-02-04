@@ -14,6 +14,7 @@ API REST permettant de gérer des campagnes publicitaires digitales :
 - MongoDB
 - Mongoose
 - Joi (validation)
+- Swagger/OpenAPI (documentation API)
 
 ---
 
@@ -55,18 +56,32 @@ npm start
 ```
 Le serveur sera accessible sur : http://localhost:3000
 
+## Documentation API (Swagger)
+
+L'API est documentée avec Swagger. Une fois le serveur démarré, accédez à la documentation interactive à l'adresse suivante :
+
+**http://localhost:3000/api-docs**
+
+La documentation Swagger permet de :
+- Consulter tous les endpoints disponibles
+- Voir les schémas de données et les exemples
+- Tester les API directement depuis l'interface
+- Comprendre les paramètres requis et les réponses attendues
+
 ## Endpoints
 ```
-| Méthode | Endpoint                  | Description                                                                                                  |
-| ------- | ------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| POST    | /api/campaigns            | Créer une nouvelle campagne                                                                                  |
-| GET     | /api/campaigns            | Lister les campagnes (filtrage par status, startDate, endDate possible, pagination via `next` et `previous`) |
-| GET     | /api/campaigns/:id        | Détails d’une campagne                                                                                       |
-| PATCH   | /api/campaigns/:id/status | Mettre à jour le statut (`active`, `paused`, `finished`)                                                     |
-| GET     | /api/campaigns/:id/stats  | Récupérer les statistiques d’une campagne (CTR, CPC)                                                         |
+| Méthode | Endpoint                        | Description                                                                                                  |
+| ------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| POST    | /api/campaign                  | Créer une nouvelle campagne                                                                                  |
+| GET     | /api/campaign                  | Lister les campagnes (filtrage par status, startDate, endDate possible, pagination via `next` et `previous`) |
+| GET     | /api/campaign/:id              | Détails d'une campagne                                                                                       |
+| PATCH   | /api/campaign/:id/status       | Mettre à jour le statut (`active`, `paused`, `finished`)                                                     |
+| GET     | /api/campaign/:id/stats        | Récupérer les statistiques d'une campagne (CTR, CPC)                                                         |
+| POST    | /api/campaign/:id/click        | Enregistrer un clic pour une campagne                                                                        |
+| POST    | /api/campaign/:id/impression   | Enregistrer une impression pour une campagne                                                                 |
 ```
 
-## Exemple POST /api/campaigns
+## Exemple POST /api/campaign
 ```json
 {
   "name": "Campaign Test",
@@ -77,15 +92,24 @@ Le serveur sera accessible sur : http://localhost:3000
   "status": "paused"
 }
 ```
-## Exemple PATCH /api/campaigns/:id/status
-```lua
-GET /api/campaigns?status=active&next=1
+## Exemple GET /api/campaign
+```bash
+GET /api/campaign?status=active&next=1
+```
+
+## Exemple PATCH /api/campaign/:id/status
+```json
+{
+  "status": "active"
+}
 ```
 ## Choix techniques
 
 Architecture en couches : controllers / services / models
 
 Validation avec Joi pour sécuriser les données entrantes
+
+Documentation API avec Swagger/OpenAPI pour faciliter l'intégration et les tests
 
 Logique métier isolée dans le service (ex: calcul CTR/CPC, transitions de statut)
 
