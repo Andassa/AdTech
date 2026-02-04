@@ -12,10 +12,13 @@ export const CampaignProvider = ({ children }) => {
   const fetchCampaigns = useCallback(async (filters = {}) => {
     setLoading(true);
     setError(null);
+    
     try {
       const res = await getCampaigns(filters);
+      console.log('API Response:', res); // Debug
       if (res.success && res.data) {
         setCampaigns(res.data);
+        // Le backend retourne nbPage, limit, skip, total, nbEnd
         setPagination(res.pagination || null);
       } else {
         setError(res.message || 'Erreur lors du chargement des campagnes');
@@ -72,6 +75,7 @@ export const CampaignProvider = ({ children }) => {
     }
   };
 
+  // Chargement initial (le backend gère la pagination via NB_PAGINATION)
   useEffect(() => { fetchCampaigns(); }, [fetchCampaigns]);
 
   return (

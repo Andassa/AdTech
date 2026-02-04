@@ -26,16 +26,15 @@ const SearchInput = ({ onSearch, placeholder = "Rechercher par nom..." }) => {
       <div
         className={`
           flex flex-row items-center justify-center
-          px-5 py-1 gap-1
-          h-12
+          gap-1
           rounded-full
           transition-all duration-200
           ${
             isFocused
-              ? 'bg-violet-50 border-[5px] border-violet-300'
+              ? 'px-5 py-1 h-12 bg-violet-50 border-[5px] border-violet-300'
               : searchTerm
-              ? 'bg-white border-[1.5px] border-gray-200 hover:bg-violet-50 hover:border-violet-200'
-              : 'bg-transparent border-0'
+              ? 'px-5 py-1 h-12 bg-white border-[1.5px] border-gray-200 hover:bg-violet-50 hover:border-violet-200'
+              : 'px-0 py-0 h-auto bg-transparent border-0'
           }
         `}
       >
@@ -48,14 +47,23 @@ const SearchInput = ({ onSearch, placeholder = "Rechercher par nom..." }) => {
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             placeholder={placeholder}
+            style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
             className={`
               w-full
               font-medium text-sm leading-5
               flex items-center
               flex-1
               bg-transparent
-              outline-none
-              border-0
+              !outline-none
+              !border-none
+              !shadow-none
+              !ring-0
+              appearance-none
+              focus:!outline-none
+              focus:!border-none
+              focus:!ring-0
+              focus:!shadow-none
+              focus-visible:!outline-none
               ${
                 isFocused || searchTerm
                   ? 'text-gray-900'

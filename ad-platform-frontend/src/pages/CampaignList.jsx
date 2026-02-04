@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCampaigns } from '../hooks/useCampaigns';
 import StatusBadge from '../components/StatusBadge';
@@ -14,54 +14,68 @@ const CampaignList = () => {
   const navigate = useNavigate();
   const { campaigns, loading, error, pagination, fetchCampaigns } = useCampaigns();
   const [searchTerm, setSearchTerm] = useState('');
+  const [localFilterTerm, setLocalFilterTerm] = useState(''); // Pour le filtrage instantané
   const debounceTimerRef = useRef(null);
-  const fetchCampaignsRef = useRef(fetchCampaigns);
   const isInitialMount = useRef(true);
 
-  // Mettre à jour la ref quand fetchCampaigns change
-  useEffect(() => {
-    fetchCampaignsRef.current = fetchCampaigns;
-  }, [fetchCampaigns]);
-
   const handleRowClick = (id) => navigate(`/campaigns/${id}`);
-  const handlePageChange = async (params) => await fetchCampaigns(params);
+  
+  // Gestion du changement de page
+  const handlePageChange = useCallback(async (params) => {
+    const filters = { ...params };
+    if (searchTerm && searchTerm.trim() !== '') {
+      filters.keyword = searchTerm.trim();
+    }
+    await fetchCampaigns(filters);
+  }, [fetchCampaigns, searchTerm]);
 
-  // Debounce pour la recherche - ne se déclenche pas au montage initial
+  // Filtrage côté client INSTANTANÉ pendant la frappe
+  const displayedCampaigns = useMemo(() => {
+    if (!campaigns) return [];
+    if (!localFilterTerm.trim()) return campaigns;
+    
+    const search = localFilterTerm.toLowerCase().trim();
+    return campaigns.filter((c) => 
+      c.name?.toLowerCase().includes(search) ||
+      c.advertiser?.toLowerCase().includes(search) ||
+      c.status?.toLowerCase().includes(search)
+    );
+  }, [campaigns, localFilterTerm]);
+
+  // Recherche backend avec debounce
   useEffect(() => {
-    // Ignorer le premier rendu (montage initial)
     if (isInitialMount.current) {
       isInitialMount.current = false;
       return;
     }
 
-    // Nettoyer le timer précédent
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
 
-    // Créer un nouveau timer
+    // Lancer la recherche backend après 400ms d'inactivité
     debounceTimerRef.current = setTimeout(() => {
+      setSearchTerm(localFilterTerm); // Synchroniser pour la pagination
       const filters = {};
-      if (searchTerm && searchTerm.trim() !== '') {
-        filters.keywoard = searchTerm.trim();
+      if (localFilterTerm && localFilterTerm.trim() !== '') {
+        filters.keyword = localFilterTerm.trim();
       }
-      // Utiliser la ref pour éviter les dépendances et les re-renders
-      fetchCampaignsRef.current(filters);
-    }, 4000); // Debounce de 4 secondes
+      fetchCampaigns(filters);
+    }, 400);
 
-    // Cleanup function
     return () => {
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }
     };
-  }, [searchTerm]); // Retirer fetchCampaigns des dépendances
+  }, [localFilterTerm, fetchCampaigns]);
 
   const handleSearch = useCallback((value) => {
-    setSearchTerm(value);
+    setLocalFilterTerm(value); // Mise à jour instantanée pour le filtrage local
   }, []);
 
-  if (loading)
+  // Spinner uniquement au premier chargement (pas pendant la recherche)
+  if (loading && (!campaigns || campaigns.length === 0))
     return (
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex justify-center items-center min-h-[500px]">
         <div className="flex flex-col items-center gap-4">
@@ -90,7 +104,8 @@ const CampaignList = () => {
       </div>
     );
 
-  if (!campaigns || campaigns.length === 0)
+  // Aucune campagne - seulement si vraiment vide (pas pendant une recherche)
+  if ((!campaigns || campaigns.length === 0) && !localFilterTerm && !loading)
     return (
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
@@ -133,7 +148,13 @@ const CampaignList = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Mes Campagnes</h1>
-          <p className="text-gray-600">{campaigns.length} {campaigns.length === 1 ? 'campagne' : 'campagnes'} au total</p>
+          <p className="text-gray-600">
+            {localFilterTerm ? (
+              <>{displayedCampaigns.length} campagne{displayedCampaigns.length > 1 ? 's' : ''} trouvée{displayedCampaigns.length > 1 ? 's' : ''}</>
+            ) : (
+              <>{pagination?.total || displayedCampaigns.length} campagne{(pagination?.total || displayedCampaigns.length) > 1 ? 's' : ''} au total</>
+            )}
+          </p>
         </div>
         <FabButton
           label="Créer une campagne"
@@ -153,7 +174,21 @@ const CampaignList = () => {
         />
       </div>
 
+      {/* Message si aucun résultat de recherche */}
+      {displayedCampaigns.length === 0 && localFilterTerm && !loading && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center mb-6">
+          <div className="text-gray-500">
+            <svg className="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <p className="text-lg font-medium">Aucun résultat pour "{localFilterTerm}"</p>
+            <p className="text-sm mt-1">Essayez avec d'autres termes de recherche</p>
+          </div>
+        </div>
+      )}
+
       {/* Tableau desktop */}
+      {displayedCampaigns.length > 0 && (
       <div className="hidden lg:block bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -165,7 +200,7 @@ const CampaignList = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {campaigns.map((c) => {
+              {displayedCampaigns.map((c) => {
                 const ctr = calculateCTR(c.impressions || 0, c.clicks || 0);
                 return (
                   <tr
@@ -205,10 +240,12 @@ const CampaignList = () => {
           <Pagination pagination={pagination} onPageChange={handlePageChange} loading={loading} />
         </div>
       </div>
+      )}
 
       {/* Cartes mobile/tablette */}
+      {displayedCampaigns.length > 0 && (
       <div className="lg:hidden space-y-4">
-        {campaigns.map((c) => {
+        {displayedCampaigns.map((c) => {
           const ctr = calculateCTR(c.impressions || 0, c.clicks || 0);
           return (
             <div
@@ -246,8 +283,9 @@ const CampaignList = () => {
           );
         })}
       </div>
+      )}
 
-      {pagination && (
+      {pagination && displayedCampaigns.length > 0 && (
         <div className="lg:hidden mt-6 bg-white rounded-xl shadow-sm border border-gray-200 p-4">
           <Pagination pagination={pagination} onPageChange={handlePageChange} loading={loading} />
         </div>

@@ -5,50 +5,63 @@ const Campaigndb = require( "../models/campaign.model" );
 
 exports.getNext = ( nextPage, totalPage ) =>
 {
-    var nbLimit = process.env.NB_PAGINATION;
-    var skipValue = 0;
-    var nbEnd = ( skipValue - 1 ) + nbLimit;
+    var limit = Number(process.env.NB_PAGINATION) || 10;
+    var skip = 0;
+    var nbEnd = skip + limit;
+    
     if ( nextPage <= 1 )
     {
         nextPage = 1;
     }
-    if ( nextPage + nbLimit <= totalPage )
+    
+    // Calculer le skip pour la page suivante
+    skip = nextPage * limit;
+    nbEnd = skip + limit;
+    
+    if ( skip >= totalPage )
     {
-        skipValue = ( nextPage - 1 ) + nbLimit;
-        nbEnd = ( skipValue ) + nbLimit;
-        if ( nbEnd >= totalPage )
-        {
-            nbEnd = totalPage;
-        }
-    } else
+        // On est déjà à la dernière page, rester sur la dernière
+        skip = Math.max(0, totalPage - limit);
+    }
+    
+    if ( nbEnd > totalPage )
     {
-        skipValue = nextPage - 1;
         nbEnd = totalPage;
     }
-    return { nbPage: skipValue + 1, nbEnd: nbEnd, nbLimit: nbLimit, skipValue: skipValue, totalPage: totalPage };
+    
+    var nbPage = Math.floor(skip / limit) + 1;
+    
+    return { nbPage: nbPage, nbEnd: nbEnd, limit: limit, skip: skip, total: totalPage };
 };
 
 
 exports.getPrevious = ( previousPage, totalPage ) =>
 {
-    var nbLimit = process.env.NB_PAGINATION;
-    var skipValue = 0;
-    var nbEnd = ( skipValue - 1 ) + nbLimit;
-    if ( previousPage - nbLimit >= 1 )
+    var limit = Number(process.env.NB_PAGINATION) || 10;
+    var skip = 0;
+    var nbEnd = limit;
+    
+    // Calculer le skip pour la page précédente
+    // previousPage est la page actuelle, on veut aller à previousPage - 1
+    var targetPage = previousPage - 1;
+    
+    if ( targetPage <= 1 )
     {
-        skipValue = ( previousPage - 1 ) - nbLimit;
-        nbEnd = skipValue + nbLimit;
-        if ( nbEnd <= 1 )
-        {
-            nbEnd = nbLimit;
-        }
-    } else
-    {
-        skipValue = 0;
-        previousPage = 1;
-        nbEnd = nbLimit;
+        targetPage = 1;
+        skip = 0;
+    } else {
+        skip = (targetPage - 1) * limit;
     }
-    return { nbPage: skipValue + 1, nbEnd: nbEnd, nbLimit: nbLimit, skipValue: skipValue, totalPage: totalPage };
+    
+    nbEnd = skip + limit;
+    if ( nbEnd > totalPage )
+    {
+        nbEnd = totalPage;
+    }
+    
+    var nbPage = Math.floor(skip / limit) + 1;
+    
+    return { nbPage: nbPage, nbEnd: nbEnd, limit: limit, skip: skip, total: totalPage };
 };
 
 exports.prepareFilter = ( key, startDate, endDate ) =>
@@ -84,13 +97,14 @@ exports.getLists = async ( filters, nbNext = null, nbPrevious = null ) =>
         );
 
         const total = await Campaigndb.countDocuments( searchKeyword );
+        const limit = Number( process.env.NB_PAGINATION ) || 10;
 
         let pagination = {
-            page: 1,
-            nbEnd: total,
-            limit: Number( process.env.NB_PAGINATION ),
+            nbPage: 1,
+            nbEnd: Math.min(limit, total),
+            limit: limit,
             skip: 0,
-            total,
+            total: total,
         };
 
         if ( nbNext )
@@ -102,10 +116,7 @@ exports.getLists = async ( filters, nbNext = null, nbPrevious = null ) =>
         {
             pagination = this.getPrevious( Number( nbPrevious ), total );
         }
-        if ( total <= pagination.nbEnd )
-        {
-            pagination.nbEnd = total;
-        }
+        
         const campaigns = await Campaigndb.find( searchKeyword )
             .skip( pagination.skip )
             .limit( pagination.limit )
