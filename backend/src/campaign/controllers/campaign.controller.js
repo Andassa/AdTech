@@ -4,10 +4,10 @@ const { createCampaignDto } = require( "../dto/create-campaign.dto" );
 
 exports.getCampaigns = async (req, res) => {
   try {
-    const { status, startDate, endDate, next, previous } = req.query;
+    const { keywoard, startDate, endDate, next, previous } = req.query;
 
     const filters = {
-      status,
+      keywoard,
       startDate,
       endDate,
     };

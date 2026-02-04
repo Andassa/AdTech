@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { getCampaigns, createCampaign, updateCampaignStatus } from '../services/api';
 
 const CampaignContext = createContext();
@@ -9,7 +9,7 @@ export const CampaignProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState(null);
 
-  const fetchCampaigns = async (filters = {}) => {
+  const fetchCampaigns = useCallback(async (filters = {}) => {
     setLoading(true);
     setError(null);
     try {
@@ -27,7 +27,7 @@ export const CampaignProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const addCampaign = (c) => setCampaigns((prev) => [c, ...prev]);
 
@@ -72,7 +72,7 @@ export const CampaignProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => { fetchCampaigns(); }, []);
+  useEffect(() => { fetchCampaigns(); }, [fetchCampaigns]);
 
   return (
     <CampaignContext.Provider

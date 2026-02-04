@@ -61,7 +61,7 @@ exports.prepareFilter = ( key, startDate, endDate ) =>
     const regex = new RegExp( key, 'i' );
     var tmp = regex;
     filter.$and.push( {
-        $or: [ { name: { $regex: tmp } }, { advertiser: { $regex: tmp } } ]
+        $or: [ { name: { $regex: tmp } }, { advertiser: { $regex: tmp } }, { status: { $regex: tmp } } ]
     } );
 
     if ( startDate != null && endDate != null && startDate.trim() != "" && endDate.trim() != "" )
@@ -78,7 +78,7 @@ exports.getLists = async ( filters, nbNext = null, nbPrevious = null ) =>
     try
     {
         const searchKeyword = this.prepareFilter(
-            filters.status,
+            filters.keywoard,
             filters.startDate,
             filters.endDate
         );

@@ -1,8 +1,10 @@
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCampaigns } from '../hooks/useCampaigns';
 import StatusBadge from '../components/StatusBadge';
 import FabButton from '../components/FabButton';
 import Pagination from '../components/Pagination';
+import SearchInput from '../components/SearchInput';
 import addIcon from '../assets/icons/add.svg';
 
 const calculateCTR = (impressions, clicks) =>
@@ -11,9 +13,42 @@ const calculateCTR = (impressions, clicks) =>
 const CampaignList = () => {
   const navigate = useNavigate();
   const { campaigns, loading, error, pagination, fetchCampaigns } = useCampaigns();
+  const [searchTerm, setSearchTerm] = useState('');
+  const debounceTimerRef = useRef(null);
 
   const handleRowClick = (id) => navigate(`/campaigns/${id}`);
   const handlePageChange = async (params) => await fetchCampaigns(params);
+
+  // Debounce pour la recherche
+  useEffect(() => {
+    // Nettoyer le timer précédent
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    // Créer un nouveau timer
+    debounceTimerRef.current = setTimeout(() => {
+      const filters = {};
+      if (searchTerm && searchTerm.trim() !== '') {
+        filters.keywoard = searchTerm.trim();
+        console.log('🔍 Recherche avec terme:', searchTerm.trim());
+      } else {
+        console.log('🔍 Recherche sans filtre (affichage de toutes les campagnes)');
+      }
+      fetchCampaigns(filters);
+    }, 300);
+
+    // Cleanup function
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [searchTerm, fetchCampaigns]);
+
+  const handleSearch = useCallback((value) => {
+    setSearchTerm(value);
+  }, []);
 
   if (loading)
     return (
@@ -96,6 +131,14 @@ const CampaignList = () => {
           iconPosition="leading"
           onClick={() => navigate('/create')}
           className="w-full sm:w-auto"
+        />
+      </div>
+
+      {/* Barre de recherche - Centrée en haut du tableau */}
+      <div className="flex justify-center mb-6">
+        <SearchInput
+          onSearch={handleSearch}
+          placeholder="Rechercher par nom, annonceur ou statut..."
         />
       </div>
 

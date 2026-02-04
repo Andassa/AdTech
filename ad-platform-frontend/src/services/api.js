@@ -49,8 +49,11 @@ const api = axios.create({
                   if (filters.endDate) params.endDate = filters.endDate;
                   if (filters.next) params.next = filters.next;
                   if (filters.previous) params.previous = filters.previous;
+                  if (filters.keywoard) params.keywoard = filters.keywoard;
               
+                  console.log('📡 Appel API avec params:', params);
                   const response = await api.get('/', { params });
+                  console.log('✅ Réponse API:', response.data);
                   return response.data; 
                 } catch (error) {
                   console.error('Erreur lors de la récupération des campagnes:', error);
