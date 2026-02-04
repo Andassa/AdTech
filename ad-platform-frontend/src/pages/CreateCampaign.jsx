@@ -57,7 +57,7 @@ const CreateCampaign = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 md:p-10">
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-linear-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
@@ -155,7 +155,7 @@ const CreateCampaign = () => {
               <button type="button" onClick={() => navigate('/')} className="w-full sm:w-auto px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg font-semibold transition-all duration-200 disabled:opacity-50" disabled={loading}>
                 Annuler
               </button>
-              <button type="submit" className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 text-white rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2" disabled={loading}>
+              <button type="submit" className="w-full sm:w-auto px-6 py-3 bg-linear-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 text-white rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2" disabled={loading}>
                 {loading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : 'Créer la campagne'}
               </button>
             </div>

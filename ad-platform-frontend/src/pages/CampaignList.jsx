@@ -103,7 +103,7 @@ const CampaignList = () => {
       <div className="hidden lg:block bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+            <thead className="bg-linear-to-r from-gray-50 to-gray-100">
               <tr>
                 {['Nom','Annonceur','Statut','Budget','CTR','Actions'].map((th) => (
                   <th key={th} className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">{th}</th>
