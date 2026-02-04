@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const campaignController = require("../controllers/campaign.controller");
+const controller = require("../controllers/campaign.controller");
 
 router.post("/", controller.createCampaign);
 router.get("/", controller.getCampaigns);

@@ -1,5 +1,11 @@
 import { useCampaignContext } from '../context/CampaignContext';
 
-const useCampaigns = () => useCampaignContext();
+/**
+ * @returns {Object} Contexte complet des campagnes
+ */
+export const useCampaigns = () => {
+  return useCampaignContext();
+};
 
 export default useCampaigns;
+
