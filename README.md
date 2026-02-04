@@ -32,6 +32,23 @@ PORT=3000
 MONGO_URI=<votre_uri_mongodb>
 NB_PAGINATION=10
 ```
+### Configuration Base de Données
+
+⚠️ **Important** : Le frontend nécessite que le backend soit configuré et connecté à MongoDB.
+
+Avant de lancer le frontend, assurez-vous que le backend est configuré avec un fichier `.env` à la racine du projet backend :
+
+```.env
+PORT=3000
+MONGO_URI=<votre_uri_mongodb>
+NB_PAGINATION=10
+```
+
+**Exemple d'URI MongoDB** :
+- **MongoDB Atlas** : `mongodb+srv://username:password@cluster.mongodb.net/dbname?retryWrites=true&w=majority`
+- **MongoDB Local** : `mongodb://localhost:27017/adtech`
+
+Le backend doit être démarré et connecté à MongoDB pour que le frontend puisse fonctionner correctement.
 ## Lancer le projet
 ```.bash
 npm start
