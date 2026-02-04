@@ -26,8 +26,13 @@ const CampaignDetail = () => {
           setCampaign(campaignResponse.data);
           try {
             const statsResponse = await getCampaignStats(id);
-            if (statsResponse.success && statsResponse.data) setStats(statsResponse.data);
-          } catch {}
+            if (statsResponse.success && statsResponse.data) {
+              console.log('Stats reçues de l\'API:', statsResponse.data);
+              setStats(statsResponse.data);
+            }
+          } catch (err) {
+            console.error('Erreur lors de la récupération des stats:', err);
+          }
         } else {
           setError(campaignResponse.message || 'Campagne introuvable');
         }
@@ -62,12 +67,20 @@ const CampaignDetail = () => {
     clicks: campaign?.clicks || 0,
   });
 
-  const displayStats = stats || {
-    ctr: backupStats.ctr,
-    cpc: backupStats.cpc,
-    impressions: campaign?.impressions || 0,
-    clicks: campaign?.clicks || 0,
-  };
+  // Utiliser les stats de l'API si disponibles, sinon utiliser le fallback
+  const displayStats = stats && stats.ctr !== undefined && stats.cpc !== undefined
+    ? {
+        ctr: stats.ctr,
+        cpc: stats.cpc,
+        impressions: stats.impressions ?? campaign?.impressions ?? 0,
+        clicks: stats.clicks ?? campaign?.clicks ?? 0,
+      }
+    : {
+        ctr: backupStats.ctr,
+        cpc: backupStats.cpc,
+        impressions: campaign?.impressions || 0,
+        clicks: campaign?.clicks || 0,
+      };
 
   if (loading)
     return (

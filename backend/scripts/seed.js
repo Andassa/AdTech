@@ -1,5 +1,8 @@
 require("dotenv").config();
 const axios = require("axios");
+const mongoose = require("mongoose");
+const Campaigndb = require("../src/campaign/models/campaign.model");
+const connectDB = require("../src/config/database");
 
 const API_URL = process.env.API_URL || "http://localhost:3000/api/campaign";
 
@@ -69,30 +72,34 @@ async function createCampaign(campaignData) {
   }
 }
 
-// Fonction ajouter impressions
+// Fonction ajouter impressions (optimisée - mise à jour directe en DB)
 async function addImpressions(campaignId, count) {
   try {
-    for (let i = 0; i < count; i++) {
-      await axios.post(`${API_URL}/${campaignId}/impression`);
+    const campaign = await Campaigndb.findById(campaignId);
+    if (campaign && campaign.status === "active") {
+      campaign.impressions += count;
+      await campaign.save();
     }
   } catch (error) {
     console.error(
       `Erreur lors de l'ajout d'impressions pour la campagne ${campaignId}:`,
-      error.response?.data?.message || error.message
+      error.message
     );
   }
 }
 
-// Fonctionajouterclics
+// Fonction ajouter clics (optimisée - mise à jour directe en DB)
 async function addClicks(campaignId, count) {
   try {
-    for (let i = 0; i < count; i++) {
-      await axios.post(`${API_URL}/${campaignId}/click`);
+    const campaign = await Campaigndb.findById(campaignId);
+    if (campaign && campaign.status === "active") {
+      campaign.clicks += count;
+      await campaign.save();
     }
   } catch (error) {
     console.error(
       `Erreur lors de l'ajout de clics pour la campagne ${campaignId}:`,
-      error.response?.data?.message || error.message
+      error.message
     );
   }
 }
@@ -104,6 +111,34 @@ async function checkBackend() {
     return true;
   } catch (error) {
     return false;
+  }
+}
+
+// Fonction pour supprimer les campagnes existantes
+async function clearExistingCampaigns() {
+  try {
+    const count = await Campaigndb.countDocuments();
+    if (count > 0) {
+      console.log(`🗑️  Suppression de ${count} campagnes existantes...`);
+      await Campaigndb.deleteMany({});
+      console.log("✅ Campagnes supprimées\n");
+    }
+  } catch (error) {
+    console.error("❌ Erreur lors de la suppression:", error.message);
+  }
+}
+
+// Fonction pour supprimer les campagnes existantes
+async function clearExistingCampaigns() {
+  try {
+    const count = await Campaigndb.countDocuments();
+    if (count > 0) {
+      console.log(`🗑️  Suppression de ${count} campagnes existantes...`);
+      await Campaigndb.deleteMany({});
+      console.log("✅ Campagnes supprimées\n");
+    }
+  } catch (error) {
+    console.error("❌ Erreur lors de la suppression:", error.message);
   }
 }
 
@@ -125,6 +160,19 @@ async function seedDatabase() {
     process.exit(1);
   }
   console.log(" Backend accessible\n");
+
+  // Se connecter à MongoDB pour les mises à jour directes
+  console.log("🔗 Connexion à MongoDB...");
+  try {
+    await connectDB();
+    console.log("✅ MongoDB connecté\n");
+    
+    // Supprimer les campagnes existantes pour éviter les conflits
+    await clearExistingCampaigns();
+  } catch (error) {
+    console.error("❌ Erreur de connexion à MongoDB:", error.message);
+    console.error("   Le script utilisera l'API (plus lent)");
+  }
 
   const createdCampaigns = [];
 
@@ -201,11 +249,20 @@ async function seedDatabase() {
   console.log(`  - Terminées: ${finishedCount}\n`);
 
   console.log(" Vous pouvez maintenant visualiser les données dans le frontend !");
+
+  // Fermer la connexion MongoDB
+  if (mongoose.connection.readyState === 1) {
+    await mongoose.connection.close();
+    console.log("\n🔌 Connexion MongoDB fermée");
+  }
 }
 
 // Exécuter le script
 seedDatabase().catch((error) => {
   console.error(" Erreur lors de l'exécution du script:", error.message);
+  if (mongoose.connection.readyState === 1) {
+    mongoose.connection.close();
+  }
   process.exit(1);
 });
 
